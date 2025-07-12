@@ -1,0 +1,5 @@
+{
+  "name": "parse_user_preference",
+  "server_path": "example_mcp_servers/parse_user_preference_server.py",
+  "entrypoint": "parse_user_input"
+}
