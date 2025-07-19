@@ -12,5 +12,12 @@
     "transport_type": "stdio",
     "capabilities": ["tools", "prompts", "resources"],
     "timeout": 15.0
+  },
+  {
+    "name": "city_price_server",
+    "server_path": "example_mcp_servers/city_price_server.py",
+    "transport_type": "stdio",
+    "capabilities": ["tools"],
+    "timeout": 15.0
   }
 ]
