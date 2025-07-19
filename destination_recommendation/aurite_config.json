@@ -1,0 +1,19 @@
+{
+  "name": "aurite",
+  "mcp_servers": [
+    {
+      "name": "weather_server",
+      "server_path": "destination_recommendation/weather_mcp_server.py",
+      "capabilities": ["tools", "prompts"],
+      "timeout": 15.0
+    }
+  ],
+  "agents": [
+    {
+      "name": "Weather Agent",
+      "system_prompt": "Your job is to use the tools at your disposal to learn the weather information needed to answer the user's query.",
+      "mcp_servers": ["weather_server"],
+      "llm_config_id": "my_openai_gpt4_turbo"
+    }
+  ]
+}
