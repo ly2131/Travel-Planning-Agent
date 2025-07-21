@@ -1,0 +1,90 @@
+{
+  "name": "search_trends_agent",
+  "version": "1.0.0",
+  "llm": [
+    {
+      "llm_id": "my_openai_gpt4_turbo",
+      "provider": "openai",
+      "model_name": "gpt-4-turbo-preview",
+      "temperature": 0.7,
+      "max_tokens": 1500,
+      "default_system_prompt": "You are a helpful AI assistant by OpenAI.",
+      "api_key_env_var": "OPENAI_API_KEY"
+    }
+  ],
+
+  "mcp_servers": [
+    {
+      "name": "Scrapeless MCP Server",
+      "transport_type": "local",
+      "command": "npx",
+      "args": ["-y", "scrapeless-mcp-server"],
+      "env": {
+        "SCRAPELESS_KEY": "SCRAPELESS_KEY"
+      },
+      "capabilities":["tools"],
+      "timeout": 15.0
+    }
+  ],
+
+  "agent": [
+    {
+      "name": "Search Trends Agent",
+      "system_prompt": "You are a travel trends expert. Use the available tools to identify a travel destination that matches the user's preferences. CRITICAL: Your output must be structured according to the predefined JSON schema.",
+      "mcp_servers": ["search_trend_server"],
+      "llm_config_id": "my_openai_gpt4_turbo",
+      "structured_output": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "recommended_location": {
+              "type": "string",
+              "description": "The city or destination recommended based on user preferences and current travel trends"
+            },
+            "trend_level": {
+              "type": "string",
+              "enum": ["high", "medium", "low"],
+              "description": "How popular the location is currently"
+            },
+            "trend_change": {
+              "type": "string",
+              "enum": ["increasing", "stable", "decreasing"],
+              "description": "Recent change in travel interest"
+            },
+            "related_reviews": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Snippets of recent user comments or feedback related to the location"
+            },
+            "concerns_or_warnings": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1,
+              "maxItems": 3,
+              "description": "Potential concerns about the destination, such as crowds or closures"
+            },
+            "trend_summary": {
+              "type": "string",
+              "description": "A concise summary explaining why this destination is currently recommended"
+            },
+            "reference_links": {
+              "type": "array",
+              "items": { "type": "string", "format": "uri" },
+              "minItems": 1,
+              "maxItems": 3,
+              "description": "Useful URLs for learning more about the destination"
+            }
+          },
+          "required": [
+            "recommended_location",
+            "trend_level",
+            "trend_change",
+            "related_reviews",
+            "trend_summary"
+          ]
+        }
+      }
+    }
+  ]
+}
+
