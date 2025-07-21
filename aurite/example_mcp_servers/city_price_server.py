@@ -12,7 +12,7 @@ from mcp.server.stdio import stdio_server
 from spider_runner import run_sequential  # 支持多城市的同步爬虫函数
 
 # 初始化日志
-ogging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 executor = ThreadPoolExecutor(max_workers=1)
