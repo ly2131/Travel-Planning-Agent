@@ -76,78 +76,102 @@ async def main():
         # 2. Define and register an MCP server configuration
 
         mcp_server_config = ClientConfig(
-            name="search_trend_server",
+            name="Scrapeless MCP Server",
             transport_type="local",
             command="npx",
             args=["-y", "scrapeless-mcp-server"],
-            env={"SCRAPELESS_KEY": "SCRAPELESS_KEY"},
             capabilities=["tools"],
             timeout=15.0
         )
+
+        # twitter_mcp_config = ClientConfig(
+        #     name="twitter-mcp",
+        #     transport_type="local",
+        #     command="uv",
+        #     args=[
+        #         "--directory", "mcp-twitter/src",
+        #         "run", "--with", "twikit", "--with", "mcp", "tweet_service.py"
+        #     ],
+        #     capabilities=["tools"],
+        #     timeout=20.0
+        # )
+
         await aurite.register_client(mcp_server_config)
+        # await aurite.register_client(twitter_mcp_config)
 
         # 2. Define a JSON schema for a structured output
         schema = {
-            "type": "object",
-            "properties": {
-                "recommended_location": {
-                    "type": "string",
-                    "description": "The city or destination recommended based on user preferences and current travel trends"
-                },
-                "trend_level": {
-                    "type": "string",
-                    "enum": ["high", "medium", "low"],
-                    "description": "How popular the location is currently"
-                },
-                "trend_change": {
-                    "type": "string",
-                    "enum": ["increasing", "stable", "decreasing"],
-                    "description": "Recent change in travel interest"
-                },
-                "related_reviews": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "description": "Snippets of recent user comments or feedback related to the location"
-                },
-                "concerns_or_warnings": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "minItems": 1,
-                    "maxItems": 3,
-                    "description": "Potential concerns about the destination, such as crowds or closures"
-                },
-                "trend_summary": {
-                    "type": "string",
-                    "description": "A concise summary explaining why this destination is currently recommended"
-                },
-                "reference_links": {
-                    "type": "array",
-                    "items": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "recommended_location": {
                         "type": "string",
-                        "format": "uri"
+                        "description": "The city or destination recommended based on user preferences and current travel trends"
                     },
-                    "minItems": 1,
-                    "maxItems": 3,
-                    "description": "Useful URLs for learning more about the destination"
-                }
-            },
-            "required": [
-                "recommended_location",
-                "trend_level",
-                "trend_change",
-                "related_reviews",
-                "trend_summary"
-            ]
+                    "trend_level": {
+                        "type": "string",
+                        "enum": ["high", "medium", "low"],
+                        "description": "How popular the location is currently"
+                    },
+                    "personalized_reviews": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "user_profile": {
+                                    "type": "string",
+                                    "description": "Type of traveler, e.g. 'solo backpacker', 'family with kids'"
+                                },
+                                "comment": {
+                                    "type": "string",
+                                    "description": "The actual review content"
+                                },
+                            },
+                            "required": ["user_profile", "comment"]
+                        },
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "description": "Recent reviews tailored by traveler type"
+                    },
+                    "trend_summary": {
+                        "type": "string",
+                        "description": "A concise summary explaining why this destination is currently recommended"
+                    },
+                    "reference_links": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uri"
+                        },
+                        "minItems": 1,
+                        "maxItems": 3,
+                        "description": "Useful URLs for learning more about the destination"
+                    }
+                },
+                "required": [
+                    "recommended_location",
+                    "trend_level",
+                    "personalized_reviews",
+                    "trend_summary",
+                    "reference_links"
+                ]
+            }
         }
 
         # # 3. Define and register an Agent configuration
         agent_config = AgentConfig(
             name="Search Trends Agent",
-            system_prompt= (
-                "You are a travel trends expert. Use the available tools to identify a travel destination that matches the user's preferences. "
-                "CRITICAL: Your output must be structured according to the predefined JSON schema."
+            system_prompt=(
+                "You are a travel trends expert. Use Scrapeless MCP Server."
+                # "For extracting user reviews and trend signals. Use Scrapeless MCP Server only "
+                # "For fact-checking or when no Twitter data is found."
+                "Return a JSON array of 3 recommendation objects directly, without any wrapping object or response key."
+                # "Always call `get_travel_trend_recommendations` with a user keyword (e.g. 'summer vacation', 'family trip') "
             ),
-            mcp_servers=["Scrapeless MCP Server"],
+        mcp_servers=["Scrapeless MCP Server"],
             llm_config_id="openai_gpt4_turbo",
             config_validation_schema=schema
         )
@@ -155,30 +179,30 @@ async def main():
         # --- End of Dynamic Registration Example ---
 
         # 4. Define the user's query for the agent using structured JSON input.
-        # user_query = {
-        #     "start_date": "2025-07-13",
-        #     "end_date": "2025-07-16",
-        #     "region": "Kyoto",
-        #     "activity_preferences": "temple visits",
-        #     "budget_level": "medium",
-        #     "things_to_avoid": "crowds"
-        # }
+        user_query = {
+            "start_date": "2025-07-13",
+            "end_date": "2025-07-16",
+            "region": "China",
+            "activity_preferences": "university visits",
+            "budget_level": "medium",
+            "things_to_avoid": "crowds"
+        }
         # user_query= {
         #     "start_date": "2025-08-20",
         #     "end_date": "2025-08-23",
-        #     "region": "Shaanxi",
+        #     "region": "not sure",
         #     "activity_preferences": "historical places",
         #     "budget_level": "low",
         #     "things_to_avoid": "crowds"
         # }
-        user_query = {
-            "start_date": "2025-12-20",
-            "end_date": "2025-12-25",
-            "region": "Shanghai",
-            "activity_preferences": "fancy shopping mall",
-            "budget_level": "high",
-            "things_to_avoid": "small places"
-        }
+        # user_query = {
+        #     "start_date": "2025-12-20",
+        #     "end_date": "2025-12-25",
+        #     "region": "not sure",
+        #     "activity_preferences": "summer vacation",
+        #     "budget_level": "high",
+        #     "things_to_avoid": "indoor"
+        # }
         # Run the agent with the user's query. The check for the execution
         # facade is now handled internally by the `aurite.run_agent` method.
         agent_result = await aurite.run_agent(
@@ -188,21 +212,40 @@ async def main():
 
         # Print the agent's response in a colored format for better visibility.
 
+        # # print query
+        # print("\nYour Query:")
+        # print(json.dumps(user_query, indent=2))
+        #
+        # # print raw output
+        # print("\nRaw Result:")
+        # print(agent_result.primary_text)
+
+        # display structured output
+        # display_agent_response(
+        #     agent_name="Search Trends Agent (Structured Output)",
+        #     query="Find a destination matching user preferences and trends.",
+        #     response=agent_result.primary_text
+        # )
+        # Print the agent's response in a colored format for better visibility.
+
         # print query
         print("\nYour Query:")
         print(json.dumps(user_query, indent=2))
 
+        # parse multi-output results
+        results = json.loads(agent_result.primary_text)
+
         # print raw output
         print("\nRaw Result:")
-        print(agent_result.primary_text)
+        print(json.dumps(results, indent=2))
 
-        # display structured output
-        display_agent_response(
-            agent_name="Search Trends Agent (Structured Output)",
-            query="Find a destination matching user preferences and trends.",
-            response=agent_result.primary_text
-        )
-
+        # display each option separately
+        for i, result in enumerate(results):
+            display_agent_response(
+                agent_name=f"Search Trends Agent - Option {i + 1}",
+                query="Find a destination matching user preferences and trends.",
+                response=json.dumps(result, indent=2)
+            )
 
     except Exception as e:
         logger.error(f"An error occurred during agent execution: {e}", exc_info=True)
