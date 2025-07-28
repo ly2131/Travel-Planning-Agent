@@ -1,0 +1,54 @@
+{
+  "start_date": "2025-07-28",
+  "end_date": "2025-08-01",
+  "cities": [
+    {
+      "city": "Paris",
+      "social media comments": [
+        "Absolutely magical in springtime!",
+        "Crowds around the Eiffel Tower were a bit much.",
+        "Loved the local cafes and boulangeries."
+      ],
+      "budget": {
+        "average_daily_per_person": 150
+      },
+      "weather": {
+        "avg_high_temperature": "23.2°C",
+        "avg_low_temperature": "16.0°C",
+        "avg_precipitation": "2.1 mm"
+      }
+    },
+    {
+      "city": "Tokyo",
+      "social media comments": [
+        "The subway system is incredibly efficient.",
+        "Such a mix of modern and traditional everywhere.",
+        "Food is amazing, but it can get expensive."
+      ],
+      "budget": {
+        "average_daily_per_person": 18000
+      },
+      "weather": {
+        "avg_high_temperature": "32.5°C",
+        "avg_low_temperature": "23.7°C",
+        "avg_precipitation": "0.0 mm"
+      }
+    },
+    {
+      "city": "Bangkok",
+      "social media comments": [
+        "Street food scene is unbeatable!",
+        "Traffic can be a nightmare during rush hour.",
+        "Temples are stunning—don’t miss the Emerald Buddha."
+      ],
+      "budget": {
+        "average_daily_per_person": 2000
+      },
+      "weather": {
+        "avg_high_temperature": "33.1°C",
+        "avg_low_temperature": "26.5°C",
+        "avg_precipitation": "3.4 mm"
+      }
+    }
+  ]
+}
