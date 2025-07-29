@@ -124,7 +124,7 @@ async def main():
 
         raw_data = json.loads(match.group(0))
 
-        with open("agt_msg/weather_result.json", "w", encoding="utf-8") as f:
+        with open("../agt_msg/weather_result.json", "w", encoding="utf-8") as f:
             json.dump(raw_data, f, ensure_ascii=False, indent=2)
 
         print(colored("\nSaved result to weather_result.json", "green", attrs=["bold"]))

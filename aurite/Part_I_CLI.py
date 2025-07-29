@@ -39,7 +39,7 @@ start_prompt = """please provide the following information:\n
     """
 FIELDS = ["start_date", "end_date", "region", "activities", "budget", "avoid"]
 
-async def main():
+async def partI():
     load_dotenv()
     aurite = Aurite()
     await aurite.initialize()
@@ -218,8 +218,10 @@ async def main():
     # print(weather_result)
 
 
-
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+# async def main():
+#     await partI()
+#
+#
+#
+# if __name__ == "__main__":
+#     asyncio.run(main())

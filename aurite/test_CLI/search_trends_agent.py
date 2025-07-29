@@ -152,7 +152,7 @@ async def main():
         print("\nRaw Result:")
         print(json.dumps(results, indent=2))
 
-        with open('search_trends.json', 'w', encoding='utf-8') as f:
+        with open('../search_trends.json', 'w', encoding='utf-8') as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
 
     except Exception as e:
