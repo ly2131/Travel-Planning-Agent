@@ -1,9 +1,7 @@
-
-
 import asyncio
+import json
 import logging
 from termcolor import colored
-
 from aurite import Aurite
 # CHANGE 1: Import ClientConfig
 from aurite.config.config_models import AgentConfig, LLMConfig, ClientConfig
@@ -29,13 +27,13 @@ async def main():
 
         # --- Dynamic Registration Example ---
 
-        # # 1. Define and register an LLM configuration
-        # llm_config = LLMConfig(
-        #     llm_id="openai_gpt4_turbo",
-        #     provider="openai",
-        #     model_name="gpt-4-turbo-preview",
-        # )
-        # await aurite.register_llm_config(llm_config)
+        # 1. Define and register an LLM configuration
+        llm_config = LLMConfig(
+            llm_id="gpt-4.1",
+            provider="openai",
+            model_name="gpt-4.1",
+        )
+        await aurite.register_llm_config(llm_config)
         #
         # # ✅ 注册你自己的城市价格 MCP Server
         # mcp_city_price_config = ClientConfig(
@@ -54,20 +52,71 @@ async def main():
         # await aurite.register_client(mcp_ai_fallback_config)
         #
         # # ✅ 注册代理
-        # agent_config = AgentConfig(
-        #     name="City Travel Cost Agent",
-        #     system_prompt="你是一个旅游成本助手，使用工具帮助用户查询城市的旅游预算。",
-        #     mcp_servers=["city_price_server","ai_fallback_server"],
-        #     llm_config_id="openai_gpt4_turbo",
-        # )
-        # await aurite.register_agent(agent_config)
+        agent_config = AgentConfig(
+            name="City Travel Cost Agent",
+            system_prompt="""
+                        你是一个旅游成本助手，严格按以下规则返回数据：
+                        1. **只输出合法的 JSON**，不要包含任何额外文本、Markdown 或注释。
+                        2. 示例格式：
+                        {               
+                            "start_date": "2025-07-28",
+                            "end_date": "2025-08-01",
+                            "cities": [
+                                {
+                                    "city": "Paris",
+                                    "social media comments": [
+                                        "Absolutely magical in springtime!",
+                                        "Crowds around the Eiffel Tower were a bit much.",
+                                        "Loved the local cafes and boulangeries."
+                                    ],
+                                    "budget": {},
+                                    "weather": 123
+                                }
+                        }
+                        3. do not remove or alter any existing fields
+                        """,
+            mcp_servers=["city_price_server", "ai_fallback_server"],
+            llm_config_id="gpt-4.1",
+        )
+        await aurite.register_agent(agent_config)
 
         # ✅ 用户问题
-        user_query = "请查询 beijing, paris 和 kunming 的旅游预算信息。"
-
+        user_message = {
+            "start_date": "2025-07-28",
+            "end_date": "2025-08-01",
+            "cities": [
+                {
+                    "city": "Paris",
+                    "social media comments": [
+                        "Absolutely magical in springtime!",
+                        "Crowds around the Eiffel Tower were a bit much.",
+                        "Loved the local cafes and boulangeries."
+                    ],
+                    "weather": 123
+                },
+                {
+                    "city": "Tokyo",
+                    "social media comments": [
+                        "The subway system is incredibly efficient.",
+                        "Such a mix of modern and traditional everywhere.",
+                        "Food is amazing, but it can get expensive."
+                    ],
+                    "weather": 456
+                },
+                {
+                    "city": "Bangkok",
+                    "social media comments": [
+                        "Street food scene is unbeatable!",
+                        "Traffic can be a nightmare during rush hour.",
+                        "Temples are stunning—don’t miss the Emerald Buddha."
+                    ],
+                    "weather": 789
+                }
+            ]
+        }
         agent_result = await aurite.run_agent(
             agent_name="City Travel Cost Agent",
-            user_message=user_query
+            user_message=json.dumps(user_message)
         )
 
 

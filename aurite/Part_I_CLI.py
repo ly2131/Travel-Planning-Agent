@@ -97,7 +97,7 @@ async def partI():
             # 检查是否收集完成
             if agent_json.get("complete", False):
                 print("\n✅ All information collected:")
-                print(json.dumps(state_dict[session_id], indent=2))
+                # print(json.dumps(state_dict[session_id], indent=2))
                 with open('agt_msg/preference.json', 'w', encoding='utf-8') as f:
                     json.dump(state_dict[session_id], f, ensure_ascii=False, indent=2)
                 break
@@ -116,11 +116,9 @@ async def partI():
             # JSON解析失败时的容错处理
             print("\n⚠️ Failed to parse response. Please try again.")
             user_input = input("👤 You: ").strip()
-
-
-    preferences_md = json.dumps(state_dict[session_id], indent=2)
     preferences_json = state_dict[session_id]
     date = {k: preferences_json[k] for k in ('start_date', 'end_date')}
+
 
     # Search for travel trend
     schema = {
@@ -194,29 +192,103 @@ async def partI():
     print("\nComment Result:")
     print(json.dumps(comment_results, indent=2))
 
-    # # Search for budget
-    # budget_result = await aurite.run_agent(
-    #         agent_name="City Travel Cost Agent",
-    #         user_message=f"Find travel budget for: {comment_results}"
-    #     )
-    # print(colored("\n--- Budget Result ---", "yellow", attrs=["bold"]))
-    # print(colored(f"Agent's response: {budget_result.primary_text}", "cyan", attrs=["bold"]))
 
-    #
     # Search for weather
-    weather_input = comment_results.append(date)
+    weather_input = [date] + comment_results
     weather_result = await aurite.run_agent(
-        agent_name="Multi-City Weather Agent",
-        user_message= weather_input
+            agent_name="Multi-City Weather Agent",
+            user_message=json.dumps(weather_input)
+        )
+    print(colored("\n---Weather Agent Output ---", "yellow", attrs=["bold"]))
+    print(weather_result.primary_text)
+    # Edit country name
+    for item in weather_result.primary_text:
+        if "city" in item:
+            item["city"] = item["city"].split(",", 1)[0].strip()
+
+
+    # Search for budget
+    agent_config = AgentConfig(
+        name="City Travel Cost Agent",
+        system_prompt="""
+                    You are a travel cost assistant.  Strictly follow these rules when returning data:
+                    1. Output **only** valid JSON.  Do **not** include any extra text, Markdown formatting, or comments.
+                    2. Use exactly this example structure:
+                    ```json
+                    {
+                    "city": "Kyoto",
+                    "trend_level": "medium",
+                    "comments": [
+                        "Hiking the trails around Kyoto provided an intimate experience with nature, away from the usual crowds.",
+                        "Visiting the Fushimi Inari Shrine early in the morning was peaceful and allowed for a great hike through the torii gates.",
+                        "The Arashiyama Bamboo Grove was breathtaking, and the nearby mountains offer excellent hiking opportunities."
+                    ],
+                    "trend_summary": "Kyoto offers a blend of cultural experiences and serene hiking trails, making it ideal for those looking to avoid crowded destinations.",
+                    "weather": {
+                        "avg_high_temp": "25.0°C",
+                        "avg_low_temp": "15.8°C",
+                        "avg_precipitation": "8.2 mm"
+                    },
+                    "budget": 123 USD per person per day
+                },
+                    3. do not remove or alter any existing fields
+                    4. All fields shown in the example must appear in your output.
+                    5. **budget must always include the suffix "USD per person per day".**，Example: `"123 USD per person per day"`。
+                """,
+        mcp_servers=["city_price_server", "ai_fallback_server"],
+        llm_config_id="gpt-4.1",
     )
+    await aurite.register_agent(agent_config)
+    budget_input = weather_result.primary_text
+    budget_result = await aurite.run_agent(
+        agent_name = "City Travel Cost Agent",
+        user_message = budget_input
+    )
+    print(colored(f"Agent's response: {budget_result.primary_text}", "cyan", attrs=["bold"]))
 
-    # match = re.search(r"\{.*\}", weather_result.primary_text, re.DOTALL)
-    # if not match:
-    #     raise ValueError("No valid JSON object found in agent result.")
-    # raw_data = json.loads(match.group(0))
-    # print(colored("\n---Weather Agent Output ---", "yellow", attrs=["bold"]))
-    # print(weather_result)
 
+    # Save cities info
+    with open("agt_msg/cities_info.json", "w", encoding="utf-8") as f:
+        json.dump(json.loads(budget_result.primary_text), f, ensure_ascii=False, indent=2)
+
+
+    #Desination Recommendation
+    recommendation_prompt = """
+    You are a travel planning agent. Your job is to:
+
+    1. Ingest the user’s travel preferences (dates, budget, interests, must‑see activities, things to avoid).
+    2. Review the provided list of candidate cities along with their key data (cost of living, climate, main attractions, safety, transportation).
+    3. Weigh all relevant factors—seasonality, budget alignment, activity match, travel constraints, and avoidances.
+    4. Choose one city that best meets the user’s needs.
+    5. Present your recommendation with:
+       - A clear statement of the chosen city.
+       - A concise explanation (3–5 bullet points) highlighting the top reasons why this city is the ideal pick.
+
+    Always focus on matching the user’s stated priorities and be explicit about how each factor influenced your decision.
+    """
+    agent_config = AgentConfig(
+        name="Destination Recommendation Agent",
+        system_prompt=recommendation_prompt,
+        llm_config_id="gpt-4.1",
+        include_history=True
+    )
+    await aurite.register_agent(agent_config)
+    combined = {
+            "preference": preferences_json,
+            "cities": json.loads(budget_result.primary_text)
+        }
+    recommendation_input = json.dumps(combined, ensure_ascii=False, indent=2)
+    recommendation_result = await aurite.run_agent(
+        agent_name="Destination Recommendation Agent",
+        user_message= recommendation_input
+    )
+    print(colored("\n--- Recommendation Result ---", "yellow", attrs=["bold"]))
+    print(colored(f"Agent's response: {recommendation_result.primary_text}", "cyan", attrs=["bold"]))
+
+
+    # Save destination recommendation result
+    with open('agt_msg/recommentdation_result.txt', 'w', encoding='utf-8') as f:
+        f.write(recommendation_result.primary_text)
 
 # async def main():
 #     await partI()
