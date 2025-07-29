@@ -51,19 +51,19 @@ To recommend a travel destination based on user preferences, real-world reviews,
 
 [//]: # (  ```)
 
-### 🔹 2. Destination Selection (Teammate A)
+### 🔹 2. Destination Selection 
 - **Function**: Search internet reviews and rankings based on user input to pick top 3 recommended destinations.
 - **Tool/server path**: `scrapeless-mcp-server`
 
 [//]: # (- **Output example**: `TODO: JSON or summary of selected cities`)
 
-### 🔹 3. Weather Information (Teammate B)
+### 🔹 3. Weather Information 
 - **Function**: Get forecast for each destination (temperature, rain, etc.)
 - **Tool/server path**: `Part_I_mcp_servers/weather_server.py`
 
 [//]: # (- **Output example**: `TODO: weather JSON format`)
 
-### 🔹 4. Price Estimation (Teammate C)
+### 🔹 4. Price Estimation 
 - **Function**: Estimate cost breakdown (transportation, hotel, food)
 - **Tool/server path**: `Part_I_mcp_servers/city_price_server.py`,`Part_I_mcp_servers/ai_fallback_server.py`
 
