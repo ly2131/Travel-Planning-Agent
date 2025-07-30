@@ -52,8 +52,8 @@ To recommend a travel destination based on user preferences, real-world reviews,
 [//]: # (  ```)
 
 ### 🔹 2. Destination Selection
-- **Function**: Search internet reviews and rankings based on user input to pick top 3 recommended destinations.
-- **Tool/server path**: `scrapeless-mcp-server`
+- **Function**: Perform real-time queries on search engines based on user input to pick top 3 recommended destinations.
+- **Tool/server path**: `scrapeless-mcp-server`, `google_search`
 
 [//]: # (- **Output example**: `TODO: JSON or summary of selected cities`)
 
