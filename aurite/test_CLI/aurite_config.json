@@ -1,0 +1,27 @@
+{
+  "name": "aurite_restaurant_project",
+  "llms": [
+    {
+      "llm_id": "openai_gpt35_turbo",
+      "provider": "openai",
+      "model_name": "gpt-3.5-turbo"
+    }
+  ],
+  "mcp_servers": [
+    {
+      "name": "restaurant_server",
+      "transport_type": "stdio",
+      "server_path": "/Users/xx-g/Desktop/Travel-Planning-Agent/aurite/Part_II_mcp_servers/restaurant_server.py",
+      "capabilities": ["tools"],
+      "timeout": 15.0
+    }
+  ],
+  "agents": [
+    {
+      "name": "Single-City Restaurant Agent",
+      "system_prompt": "You are a helpful assistant. User gives you a location name or address. Use the tool top_restaurant to find the highest rated restaurant within 3km. Return only valid JSON with fields: name, address, rating, and opening_hours.",
+      "mcp_servers": ["restaurant_server"],
+      "llm_config_id": "openai_gpt35_turbo"
+    }
+  ]
+}
