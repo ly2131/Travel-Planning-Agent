@@ -27,9 +27,10 @@ async def main():
         agent_config = AgentConfig(
             name="Single-City Restaurant Agent",
             system_prompt=(
-                "You are a helpful assistant that receives a location name and time, "
-                "and uses a tool to find the top-rated restaurant within 3km of the location. "
-                "Only return valid JSON with fields: name, address, rating, and opening_hours."
+                "You are a helpful assistant that receives a city or location and a date "
+                "and uses a tool to find the highest-rated restaurant within 3km of the location. "
+                "Return only valid JSON with keys: name, address, rating, opening_hours (for that day only), "
+                "and cuisine (e.g., Japanese, Italian, etc.)."
             ),
             mcp_servers=["restaurant_server"],
             llm_config_id="openai_gpt35_turbo"
@@ -37,8 +38,9 @@ async def main():
         await aurite.register_agent(agent_config)
 
         user_message = {
-            "location": "Eiffel Tower, Paris",
-            "time": "7 PM"
+            # "location": "Eiffel Tower, Paris",
+            'location': 'West Lake, Hangzhou',
+            "date": "2025-08-02"
         }
 
         result = await aurite.run_agent(
@@ -65,4 +67,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
