@@ -51,12 +51,10 @@ async def search_top_restaurant(args: Dict[str, Any]) -> List[types.TextContent]
     if not places:
         return [types.TextContent(type="text", text="No restaurant found nearby.")]
 
-    # Step 3: Get highest rated restaurant
     best = max(places, key=lambda p: p.get("rating", 0) or 0)
     place_id = best.get("place_id")
     name = best.get("name", "Unknown")
 
-    # Step 4: Get details
     detail_url = "https://maps.googleapis.com/maps/api/place/details/json"
     detail_params = {
         "place_id": place_id,
@@ -71,7 +69,6 @@ async def search_top_restaurant(args: Dict[str, Any]) -> List[types.TextContent]
     types_list = [t for t in det.get("types", []) if "restaurant" not in t]
     opening_text = det.get("opening_hours", {}).get("weekday_text", [])
 
-    # Step 5: Get specific date's weekday opening
     if opening_text and date_str:
         try:
             weekday_idx = datetime.strptime(date_str, "%Y-%m-%d").weekday()
