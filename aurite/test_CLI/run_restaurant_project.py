@@ -37,30 +37,58 @@ async def main():
         )
         await aurite.register_agent(agent_config)
 
+        # user_message = {
+        #     "locations": [
+        #         {
+        #             "location": "West Lake, Hangzhou",
+        #             "date": "2025-08-02"
+        #         },
+        #         {
+        #             "location": "Lingyin Temple, Hangzhou",
+        #             "date": "2025-08-02"
+        #         },
+        #         {
+        #             "location": "Leifeng Pagoda, Hangzhou",
+        #             "date": "2025-08-03"
+        #         },
+        #         {
+        #             "location": "Xixi Wetland, Hangzhou",
+        #             "date": "2025-08-03"
+        #         },
+        #         {
+        #             "location": "Grand Canal, Hangzhou",
+        #             "date": "2025-08-04"
+        #         },
+        #         {
+        #             "location": "China National Tea Museum, Hangzhou",
+        #             "date": "2025-08-04"
+        #         }
+        #     ]
+        # }
         user_message = {
             "locations": [
                 {
-                    "location": "West Lake, Hangzhou",
+                    "location": "Griffith Observatory, Los Angeles",
                     "date": "2025-08-02"
                 },
                 {
-                    "location": "Lingyin Temple, Hangzhou",
+                    "location": "Santa Monica Pier, Los Angeles",
                     "date": "2025-08-02"
                 },
                 {
-                    "location": "Leifeng Pagoda, Hangzhou",
+                    "location": "The Getty Center, Los Angeles",
                     "date": "2025-08-03"
                 },
                 {
-                    "location": "Xixi Wetland, Hangzhou",
+                    "location": "Grand Central Market, Los Angeles",
                     "date": "2025-08-03"
                 },
                 {
-                    "location": "Grand Canal, Hangzhou",
+                    "location": "Walt Disney Concert Hall, Los Angeles",
                     "date": "2025-08-04"
                 },
                 {
-                    "location": "China National Tea Museum, Hangzhou",
+                    "location": "Hollywood Walk of Fame, Los Angeles",
                     "date": "2025-08-04"
                 }
             ]
