@@ -27,10 +27,10 @@ async def main():
         agent_config = AgentConfig(
             name="Single-City Restaurant Agent",
             system_prompt=(
-                "You are a helpful assistant that receives a city or location and a date "
-                "and uses a tool to find the highest-rated restaurant within 3km of the location. "
-                "Return only valid JSON with keys: name, address, rating, opening_hours (for that day only), "
-                "and cuisine (e.g., Japanese, Italian, etc.)."
+                "You are a helpful assistant that receives a list of locations and dates, "
+                "and uses a tool to find the highest-rated restaurant within 3km of each location. "
+                "Return only valid JSON: a list of dictionaries, each with fields: "
+                "`location`, `date`, `name`, `address`, `rating`, `opening_hours` (that day only), and `cuisine`."
             ),
             mcp_servers=["restaurant_server"],
             llm_config_id="openai_gpt35_turbo"
@@ -38,9 +38,32 @@ async def main():
         await aurite.register_agent(agent_config)
 
         user_message = {
-            # "location": "Eiffel Tower, Paris",
-            'location': 'West Lake, Hangzhou',
-            "date": "2025-08-02"
+            "locations": [
+                {
+                    "location": "West Lake, Hangzhou",
+                    "date": "2025-08-02"
+                },
+                {
+                    "location": "Lingyin Temple, Hangzhou",
+                    "date": "2025-08-02"
+                },
+                {
+                    "location": "Leifeng Pagoda, Hangzhou",
+                    "date": "2025-08-03"
+                },
+                {
+                    "location": "Xixi Wetland, Hangzhou",
+                    "date": "2025-08-03"
+                },
+                {
+                    "location": "Grand Canal, Hangzhou",
+                    "date": "2025-08-04"
+                },
+                {
+                    "location": "China National Tea Museum, Hangzhou",
+                    "date": "2025-08-04"
+                }
+            ]
         }
 
         result = await aurite.run_agent(
@@ -48,14 +71,31 @@ async def main():
             user_message=json.dumps(user_message)
         )
 
-        print(colored("\n--- Restaurant Agent Output ---", "cyan", attrs=["bold"]))
+        print(colored("\n--- Restaurant Agent Raw Output ---", "cyan", attrs=["bold"]))
         print(result.primary_text)
 
         try:
             parsed = json.loads(result.primary_text)
+
             with open("restaurant_result.json", "w", encoding="utf-8") as f:
                 json.dump(parsed, f, ensure_ascii=False, indent=2)
             print(colored("\nSaved result to restaurant_result.json", "green", attrs=["bold"]))
+
+            print(colored("\n--- 🍽️ Restaurant Markdown Output ---", "magenta", attrs=["bold"]))
+            current_date = None
+            for entry in parsed:
+                if entry["date"] != current_date:
+                    print(f"\n### 📅 {entry['date']}")
+                    current_date = entry["date"]
+
+                print(f"#### 📍 {entry['location']}")
+                print(f"- 🍴 Name: {entry['name']}")
+                print(f"- 📍 Address: {entry['address']}")
+                print(f"- ⭐️ Rating: {entry['rating']}")
+                print(f"- 🕰️ Opening Hours: {entry['opening_hours']}")
+                print(f"- 🍜 Cuisine: {entry['cuisine']}")
+                print()
+
         except Exception as e:
             raise ValueError(f"Agent did not return valid JSON. Error: {e}")
 
