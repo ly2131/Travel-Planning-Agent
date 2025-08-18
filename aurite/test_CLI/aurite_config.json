@@ -1,27 +1,19 @@
 {
-  "name": "aurite_restaurant_project",
-  "llms": [
-    {
-      "llm_id": "openai_gpt35_turbo",
-      "provider": "openai",
-      "model_name": "gpt-3.5-turbo"
-    }
-  ],
+  "name": "aurite_pdf_export_project",
   "mcp_servers": [
     {
-      "name": "restaurant_server",
+      "name": "pdf_export_server",
       "transport_type": "stdio",
-      "server_path": "/Users/xx-g/Desktop/Travel-Planning-Agent/aurite/Part_II_mcp_servers/restaurant_server.py",
+      "server_path": "/Users/xx-g/Desktop/TPA/aurite/Part_II_mcp_servers/pdf_export_server.py",
       "capabilities": ["tools"],
-      "timeout": 15.0
+      "timeout": 20.0
     }
   ],
   "agents": [
     {
-      "name": "Single-City Restaurant Agent",
-      "system_prompt": "You are a helpful assistant. User gives you a location name or address. Use the tool top_restaurant to find the highest rated restaurant within 3km. Return only valid JSON with fields: name, address, rating, and opening_hours.",
-      "mcp_servers": ["restaurant_server"],
-      "llm_config_id": "openai_gpt35_turbo"
+      "name": "Markdown to PDF Agent",
+      "system_prompt": "You are a PDF export assistant. Use the tool 'markdown_to_pdf' to convert Markdown files to PDF.",
+      "mcp_servers": ["pdf_export_server"]
     }
   ]
 }
